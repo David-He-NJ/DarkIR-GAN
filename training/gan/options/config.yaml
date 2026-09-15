@@ -1,0 +1,74 @@
+network:
+  name: "DarkIR"
+  img_channels: 3
+  width: 64
+  middle_blk_num_enc: 1
+  middle_blk_num_dec: 1
+  enc_blk_nums: [2,2,4]
+  dec_blk_nums: [2,2,2]
+  dilations: [1,2,3]
+  extra_depth_wise: False
+
+train:
+  epochs: 30
+  lr_initial_G: 0.00001      # 生成器初始学习率
+  lr_initial_D: 0.0001       # 判别器初始学习率
+  betas: [0.5, 0.999]        # Adam优化器betas
+  lr_scheme: "CosineAnnealing"
+  eta_min: 0.000001          # 最后5个epoch降到1e-6
+  resume: false
+  loss:
+    # Pixel / L1 loss
+    pixel_criterion: "l1"
+    pixel_weight: 1.0        # λp = 1.0 守底线
+
+    # Perceptual loss (LPIPS)
+    perceptual: true
+    perceptual_weight: 1.0   # ★ 关键！从0.03提升到1.0，强力压制LPIPS
+    perceptual_criterion: "lpips"
+    perceptual_model: "vgg19"
+    perceptual_reduction: "mean"
+
+    # Edge loss
+    edge: true
+    edge_weight: 0.1         # ★ 关键！从30.0降到0.1，解放GAN纹理生成能力
+    edge_criterion: "l2"
+    edge_reduction: "mean"
+
+    # Frequency loss
+    frequency: false
+    frequency_weight: 1.0
+    frequency_criterion: "l1"
+    frequency_reduction: "mean"
+
+    # Enhance / LOL guiding loss
+    enhance: true
+    enhance_weight: 1.0
+    enhance_criterion: "l1"
+    enhance_reduction: "mean"
+
+    # Adversarial loss weight
+    adversarial_weight: 0.01  # ★ 关键！从0.005提升到0.01，让判别器更有话语权
+
+datasets:
+  name: "LOLBlur"
+  train:
+    name: "LOLBlur_Train"
+    dataroot: "../../datasets/LOL-Blur/train"
+    batch_size: 1
+    shuffle: true
+    verbose: true
+    n_workers: 4
+  val:
+    name: "LOLBlur_Val"
+    dataroot: "../../datasets/LOL-Blur/val"
+    batch_size: 1
+    shuffle: false
+    verbose: true
+    n_workers: 4
+
+path:
+  save_dir: "./experiments/checkpoints"
+  # 从Baseline最佳权重加载生成器
+  # 注意：代码中已硬编码为 'experiments/checkpoints/baseline_best_lpips.pt'
+  # 如需修改加载路径，请直接修改 train_gan.py 中的 checkpoint_path 变量
