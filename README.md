@@ -1,26 +1,53 @@
 # DarkIR-GAN
 
-Official training code for **DarkIR-GAN**, a low-light image restoration model built on the DarkIR architecture with adversarial training.
+**DarkIR-GAN: GAN-Based Low-Light Blurred Image Restoration**
 
-> This repository currently contains training code and configuration files only. Datasets, pretrained models, checkpoints, and experiment outputs are not included.
+Xinyu He and Shi Yan — School of Information Science and Engineering, Lanzhou University.
 
-## Repository structure
+Research code for comparing continued DarkIR training with a perception-oriented GAN fine-tuning recipe. The model combines a DarkIR generator with a five-layer PatchGAN discriminator. Restoration inference uses only the generator.
+
+## Status
+
+This research snapshot has not undergone a clean-environment GPU reproduction test. The comparison changes reconstruction weights and optimization settings as well as adversarial supervision, so it does not isolate the causal effect of the adversarial term. The documentation revision preserves the training code and historical measurements.
+
+See [implementation notes](docs/implementation_notes.md) and [reproduction requirements](docs/reproduction.md).
+
+## Workflow and structure
 
 ```text
-DarkIR-GAN/
-├── training/
-│   ├── baseline/             # Initial DarkIR baseline training and evaluation
-│   ├── baseline_continued/   # Continued baseline training from a checkpoint
-│   └── gan/                  # DarkIR-GAN adversarial training
-├── .gitignore
-└── requirements.txt
+Stage I: full-data adaptation (historical entry points in baseline/)
+    |
+Stage II: baseline training (baseline/)
+    |
+    +-- Stage III-A: continued baseline (baseline_continued/)
+    +-- Stage III-B: GAN fine-tuning (gan/)
 ```
 
-Each training directory is self-contained and includes its own model, data, loss, and configuration modules. This preserves the exact code used for each experimental stage.
+The three directories are not three consecutive stages. Stage I has no dedicated one-epoch configuration in the uploaded snapshot.
 
-## Installation
+```text
+training/
+├── baseline/
+│   ├── archs/, data/, losses/, options/
+│   ├── train_with_periodic_evaluation.py
+│   ├── train_from_pretrained.py
+│   ├── train_initial.py
+│   ├── train_baseline.py
+│   ├── train_baseline_variant.py
+│   └── evaluate.py
+├── baseline_continued/
+│   └── train_continued.py
+└── gan/
+    ├── train_gan.py
+    ├── train_baseline.py
+    └── MODEL_ARCHITECTURE.md
+```
 
-Python 3.10 or later is recommended.
+Stage-specific module copies are retained because implementations differ. The historical `gan/train_baseline.py` has a model-factory call incompatible with the GAN package; it is not the baseline launch command.
+
+## Environment
+
+Install a CUDA-compatible PyTorch/torchvision pair and the dependencies in an isolated environment. `requirements.txt` was extracted from imports; it is not the original version lock, and no fresh installation has validated a version combination. Some code paths explicitly require CUDA.
 
 ```bash
 git clone git@github.com:David-He-NJ/DarkIR-GAN.git
@@ -30,80 +57,56 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-## Data preparation
+## Data and weights
 
-Download the LOL-Blur dataset and organize it as follows:
-
-```text
-datasets/
-└── LOL-Blur/
-    ├── train/
-    └── val/
-```
-
-The default paths are defined in each `options/config.yaml`. Update them if your dataset is stored elsewhere.
-
-## Training
-
-### 1. Baseline training
-
-```bash
-cd training/baseline
-python train_baseline.py
-```
-
-Alternative baseline entry points are retained for reproducibility:
-
-- `train_initial.py`: initial baseline training routine.
-- `train_from_pretrained.py`: training initialized from pretrained DarkIR weights.
-- `train_with_periodic_evaluation.py`: training with periodic metric evaluation.
-- `train_baseline_variant.py`: the additional baseline training variant used during development.
-- `evaluate.py`: evaluation on the validation set.
-
-### 2. Continued baseline training
-
-Set `resume_path` in `training/baseline_continued/options/config.yaml`, then run:
-
-```bash
-cd training/baseline_continued
-python train_continued.py
-```
-
-### 3. DarkIR-GAN training
-
-GAN training initializes the generator from the baseline checkpoint at:
+The configured layout, relative to the repository root, is:
 
 ```text
-training/baseline/experiments/checkpoints/baseline_best_lpips.pt
+datasets/LOL-Blur/
+├── train/
+│   ├── low_blur/<scene_id>/<image>.png
+│   └── high_sharp_original/<scene_id>/<image>.png
+└── val/
+    ├── low_blur/<scene_id>/<image>.png
+    └── high_sharp_original/<scene_id>/<image>.png
 ```
 
-Then run:
+Validate pairing and dimensions before execution. The loader does not force 256×256 resizing. `weights/iqa/` must contain compatible `lpips.pth`, `musiq.pth`, `niqe.mat` and `nrqm.mat` files: they are required by the metric calls, not optional assets. Loss libraries may additionally load pretrained VGG/LPIPS weights.
+
+Datasets, weights and experiment outputs are excluded from Git.
+
+## Entry points
+
+Each command starts from the **repository root**, after preparing data, environment, metric weights and initialization. These commands identify entry points; they are not a guarantee of unverified end-to-end execution.
 
 ```bash
-cd training/gan
-python train_gan.py
+# Stage II: inspect resume_path and script overrides first.
+(cd training/baseline && python train_baseline.py)
+
+# Stage III-A.
+(cd training/baseline_continued && python train_continued.py)
+
+# Stage III-B.
+(cd training/gan && python train_gan.py)
 ```
 
-See `training/gan/MODEL_ARCHITECTURE.md` for additional architecture notes.
+Stage III-A defaults to `training/baseline/experiments/checkpoints/baseline_best_psnr.pt`; Stage III-B defaults to the sibling `baseline_best_lpips.pt`. Missing checkpoints can trigger from-scratch training, so check them explicitly.
 
-## Pretrained IQA weights
+The two supplied Stage-II archives have identical serialized metadata and tensor-storage contents despite different file hashes. This supports a shared available initialization but does not prove what a past process loaded.
 
-The training scripts expect optional IQA model files under:
+`baseline/evaluate.py` is a baseline evaluator, not a unified GAN evaluator. A standalone inference interface is not included. Outputs are saved under each stage's `experiments/` directory.
 
-```text
-weights/iqa/
-├── lpips.pth
-├── musiq.pth
-├── niqe.mat
-└── nrqm.mat
-```
+## Implemented objective
 
-These files are intentionally excluded from version control.
+Effective GAN coefficients, after including both inner and outer multipliers:
 
-## Outputs
+- Pixel L1: 1.
+- LPIPS: 1.
+- Laplacian residual MSE: 0.01.
+- LSGAN generator loss: 0.01.
 
-Checkpoints, TensorBoard logs, CSV logs, and validation visualizations are written to the local `experiments/` directory inside each training stage. These generated artifacts are excluded from Git.
+A historical input–target L1 term contributes to the logged loss but has zero generator gradient. The baseline uses a different reconstruction recipe. See the [full accounting](docs/implementation_notes.md).
 
-## Citation
+## Acknowledgements and citation
 
-Citation information will be added after the paper is accepted or published.
+The generator follows DarkIR; the framework uses PatchGAN/LSGAN concepts and LPIPS-based losses. The manuscript bibliography identifies the underlying work. No acceptance status or venue is asserted. A project license has not been selected; this snapshot does not grant a new blanket license to upstream components.
