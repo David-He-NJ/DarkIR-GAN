@@ -25,4 +25,17 @@ The remote upload, Python syntax and YAML parsing were checked. Documentation wa
 
 Matched ablations, repeated-seed variation, failure counts and clean-environment reproduction cannot be established by editing prose. Some evaluation questions may be answered from old outputs/checkpoints without retraining, but no such evaluation was run in this revision.
 
+## Controlled adversarial ablation
+
+The matched setup is under `training/gan_controlled/`. Before allocating GPU time:
+
+```bash
+python training/gan_controlled/verify_setup.py
+python -m compileall -q training/gan_controlled
+```
+
+Then place the shared Stage-II initialization at `training/baseline/experiments/checkpoints/baseline_best_psnr.pt` and launch from the controlled directory. The run aborts rather than falling back to random initialization and records the initialization SHA-256 in `training/gan_controlled/experiments/run_manifest.json`.
+
+After training, run baseline and controlled-GAN generator checkpoints through the same strict evaluator. Record metric failure counts; do not use silent zero substitution as evidence. The historical sampler does not provide proof of identical batch order, so describe the comparison as matched in dataset/split, loader behavior, training length, and generator recipe—not as batch-identical.
+
 Historical code semantics and logs are preserved. Future fixes and measurements should use a separately identified experiment revision.

@@ -38,3 +38,13 @@ The historical loss call passes tensors directly. Validation uses a separate pyi
 The current evidence supports a comparison between two recipes. Matching available initialization does not remove differences in losses, clipping, optimizers, learning rates or sampling. A causal attribution to adversarial supervision requires a matched ablation.
 
 Restoration uses the generator alone. Discriminator training cost does not establish additional generator inference cost.
+
+## Controlled GAN setup
+
+`training/gan_controlled/` defines the missing matched ablation. It imports the actual `baseline_continued` generator, dataloader, loss construction, generator optimizer/scheduler, and validation functions. Its startup guard requires the generator, train, dataset, and initialization-path configuration to remain aligned with the continued baseline.
+
+The controlled generator keeps the continued baseline's runtime overrides and effective reconstruction objective, including output clamping and its existing `E(output,target)` enhancement term. This is not a correction of the historical GAN's `C(input,target)` term; the zero-generator-gradient historical expression is absent. PatchGAN/LSGAN with coefficient `0.01` is the only added generator-objective term.
+
+The controlled run restores generator weights, optimizer state, and scheduler state from `baseline_best_psnr.pt`, fails closed if that checkpoint is unavailable, and records its SHA-256 plus the restored optimizer learning rates and scheduler epoch in a run manifest. Because optimizer state restoration occurs after construction, the first-step generator learning rate is whatever the checkpoint stores; `1e-4` is the matching construction-time override, not a guarantee about the restored state. The setup has not been trained in this repository revision.
+
+Exact batch-for-batch equivalence to the historical continued-baseline run still cannot be guaranteed. The existing sampler resamples internal paths after the dataset has captured its initial path lists, and the historical run provides no seed or consumed-sample manifest. This behavior is intentionally preserved instead of silently introducing a second experimental change.

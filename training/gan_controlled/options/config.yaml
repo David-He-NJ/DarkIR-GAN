@@ -1,0 +1,91 @@
+network:
+  name: "DarkIR"
+  img_channels: 3
+  width: 64
+  middle_blk_num_enc: 1
+  middle_blk_num_dec: 1
+  enc_blk_nums: [2,2,4]
+  dec_blk_nums: [2,2,2]
+  dilations: [1,2,3]
+  extra_depth_wise: False
+
+train:
+  epochs: 30
+  lr_initial: 0.00001    # Matches baseline_continued YAML; the launch script applies the same 1e-4 runtime override.
+  weight_decay: 0.00001
+  betas: [0.9, 0.999]
+  lr_scheme: "CosineAnnealing"
+  eta_min: 0.000001
+  resume: true
+  loss:
+    # Pixel / L1 loss
+    pixel_criterion: "l1"
+    pixel_weight: 1.0
+
+    # Perceptual loss (LPIPS)
+    perceptual: true
+    perceptual_weight: 0.1
+    perceptual_criterion: "lpips"
+    perceptual_model: "vgg19"
+    perceptual_reduction: "mean"
+
+    # Edge loss
+    edge: true
+    edge_weight: 5.0
+    edge_criterion: "l2"
+    edge_reduction: "mean"
+
+    # Frequency loss
+    frequency: false
+    frequency_weight: 1.0
+    frequency_criterion: "l1"
+    frequency_reduction: "mean"
+
+    # This is the existing baseline_continued output-target enhancement loss.
+    # It is retained unchanged for a matched generator objective. It is not the
+    # historical GAN's zero-gradient enhance_loss(inputs, targets) term.
+    enhance: true
+    enhance_weight: 0.5
+    enhance_criterion: "l1"
+    enhance_reduction: "mean"
+
+
+datasets:
+  name: "LOLBlur"
+  train:
+    name: "LOLBlur_Train"
+    dataroot: "../../datasets/LOL-Blur/train"
+    batch_size: 1
+    shuffle: true
+    verbose: true
+    n_workers: 4
+  val:
+    name: "LOLBlur_Val"
+    dataroot: "../../datasets/LOL-Blur/val"
+    batch_size: 1
+    shuffle: false
+    verbose: true
+    n_workers: 4
+
+
+path:
+  save_dir: './experiments/checkpoints'
+  resume_path: '../baseline/experiments/checkpoints/baseline_best_psnr.pt'
+
+# Controlled GAN additions. Everything above this marker mirrors
+# training/baseline_continued/options/config.yaml semantically.
+discriminator:
+  input_channels: 3
+  base_channels: 64
+  optimizer: "Adam"
+  lr_initial: 0.0001
+  betas: [0.5, 0.999]
+  weight_decay: 0.0
+  lr_scheme: "CosineAnnealing"
+  eta_min: 0.000001
+
+adversarial:
+  criterion: "mse"          # LSGAN objective, matching the historical GAN family.
+  weight: 0.01
+  real_label: 0.9
+  fake_label: 0.0
