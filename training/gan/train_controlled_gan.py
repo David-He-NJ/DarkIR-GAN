@@ -193,7 +193,7 @@ def load_initialization(generator, optimizer_g, scheduler_g, checkpoint_path, de
             "Controlled training will not fall back to training from scratch."
         )
 
-    checkpoint = torch.load(checkpoint_path, map_location=device, weights_only=False)
+    checkpoint = torch.load(checkpoint_path, map_location=device, weights_only=True)
     required = {
         "model_state_dict",
         "optimizer_state_dict",

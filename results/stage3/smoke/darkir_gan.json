@@ -1,0 +1,99 @@
+{
+  "best_lpips_smoke": 0.16218046844005585,
+  "best_psnr_smoke": 23.274272918701172,
+  "discriminator_restore_ok": true,
+  "estimated_full_run": {
+    "assumed_full_validation_batches_per_run": 1800,
+    "assumed_quick_validation_batches_per_epoch": 450,
+    "assumed_train_batches_per_epoch": 2550,
+    "full_validation_seconds": 49081.3696263358,
+    "note": "Linear smoke-test estimate; excludes startup, logging, image writes, and variance.",
+    "quick_validation_seconds": 36811.02721975185,
+    "total_hours": 41.8828231606487,
+    "total_seconds": 150778.1633783353,
+    "training_seconds": 64885.76653224765
+  },
+  "full_validation_batches": 60,
+  "generator_lr_after_initial_restore": [
+    1e-06
+  ],
+  "generator_restore_ok": true,
+  "generator_scheduler_last_epoch_after_initial_restore": 30,
+  "generator_scheduler_last_epoch_after_smoke_step": 31,
+  "gpu": "NVIDIA GeForce RTX 4080 SUPER",
+  "gpu_memory_stability": {
+    "post_warmup_allocated_end_minus_start_gib": 0.0,
+    "post_warmup_allocated_span_gib": 0.0,
+    "post_warmup_reserved_end_minus_start_gib": 0.0,
+    "post_warmup_reserved_span_gib": 0.0,
+    "stable": true,
+    "warmup_ignored_iterations": 9
+  },
+  "gradient_checks": {
+    "discriminator": {
+      "finite": true,
+      "global_l2_norm": 12.926502096227505,
+      "nonzero_tensors": 16,
+      "tensors_present": 16
+    },
+    "generator": {
+      "finite": true,
+      "global_l2_norm": 1.8274346759864284,
+      "nonzero_tensors": 329,
+      "tensors_present": 329
+    }
+  },
+  "initialization_epoch": 30,
+  "initialization_path": "/root/autodl-tmp/darkir-gan-controlled-2f08ba5e-smoke/training/baseline/experiments/checkpoints/baseline_best_psnr.pt",
+  "initialization_sha256": "dbfdc6494daae9a809607f63e74a6193a8b4ed0004c02ae9f23dda1cfc723a99",
+  "iterations": 100,
+  "peak_allocated_gib": 27.690024852752686,
+  "peak_reserved_gib": 30.005859375,
+  "python": "3.10.12",
+  "quick_validation_batches": 15,
+  "restored_discriminator_optimizer_state_entries": 16,
+  "restored_discriminator_scheduler_last_epoch": 1,
+  "restored_generator_optimizer_state_entries": 329,
+  "restored_generator_scheduler_last_epoch": 31,
+  "run_name": "smoke_strict",
+  "smoke_checkpoint": "/root/autodl-tmp/darkir-gan-controlled-2f08ba5e-smoke/training/gan_controlled/experiments/smoke_strict/checkpoints/controlled_gan_epoch_0.pt",
+  "smoke_checkpoint_sha256": "6a6bf137f55e5d96a512b40732d629b6dda21ae8bff2e25dc0f9500ac5f95030",
+  "smoke_dataset_root": "/autodl-fs/data/darkir-controlled-smoke-subset-2f08ba5e/LOL-Blur",
+  "source_commit": "2f08ba5e73347d4e2e3862f81c156ff5089e00a1",
+  "status": "PASS",
+  "torch": "2.5.1+cu124",
+  "torch_cuda": "12.4",
+  "torchvision": "0.20.1+cu124",
+  "train_batches_per_epoch": 120,
+  "train_elapsed_seconds": 84.8179954669904,
+  "train_metrics": {
+    "adv": 0.35936659932136533,
+    "d": 0.255455704331398,
+    "edge": 0.0022925318108173087,
+    "enhance": 0.01311469180509448,
+    "g": 0.041641444312408564,
+    "perceptual": 0.015842486605979502,
+    "pixel": 0.01844352456741035
+  },
+  "train_seconds_per_iteration": 0.8481799546699039,
+  "validation_batches": 2,
+  "validation_elapsed_seconds": 5.453485514037311,
+  "validation_metrics": {
+    "explicit_direct_calls": {
+      "lpips": 0.1606617122888565,
+      "musiq": 50.564430236816406,
+      "niqe": 6.787101957647542,
+      "nrqm": 3.393526077270508,
+      "psnr": 21.934507369995117,
+      "ssim": 0.8860363960266113
+    },
+    "loss": 0.07983940094709396,
+    "lpips_legacy_helper": 0.16218046844005585,
+    "musiq": 50.89749526977539,
+    "niqe": 6.644374761675515,
+    "nrqm": 3.540284752845764,
+    "psnr": 23.274272918701172,
+    "ssim": 0.8839891850948334
+  },
+  "validation_seconds_per_batch": 2.7267427570186555
+}

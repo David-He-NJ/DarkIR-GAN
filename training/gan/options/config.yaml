@@ -11,27 +11,27 @@ network:
 
 train:
   epochs: 30
-  lr_initial_G: 0.00001      # 生成器初始学习率
-  lr_initial_D: 0.0001       # 判别器初始学习率
-  betas: [0.5, 0.999]        # Adam优化器betas
+  lr_initial: 0.00001    # Matches baseline_continued YAML; the launch script applies the same 1e-4 runtime override.
+  weight_decay: 0.00001
+  betas: [0.9, 0.999]
   lr_scheme: "CosineAnnealing"
-  eta_min: 0.000001          # 最后5个epoch降到1e-6
-  resume: false
+  eta_min: 0.000001
+  resume: true
   loss:
     # Pixel / L1 loss
     pixel_criterion: "l1"
-    pixel_weight: 1.0        # λp = 1.0 守底线
+    pixel_weight: 1.0
 
     # Perceptual loss (LPIPS)
     perceptual: true
-    perceptual_weight: 1.0   # ★ 关键！从0.03提升到1.0，强力压制LPIPS
+    perceptual_weight: 0.1
     perceptual_criterion: "lpips"
     perceptual_model: "vgg19"
     perceptual_reduction: "mean"
 
     # Edge loss
     edge: true
-    edge_weight: 0.1         # ★ 关键！从30.0降到0.1，解放GAN纹理生成能力
+    edge_weight: 5.0
     edge_criterion: "l2"
     edge_reduction: "mean"
 
@@ -41,14 +41,14 @@ train:
     frequency_criterion: "l1"
     frequency_reduction: "mean"
 
-    # Enhance / LOL guiding loss
+    # This is the existing baseline_continued output-target enhancement loss.
+    # It is retained unchanged for a matched generator objective. It is not the
+    # historical GAN's zero-gradient enhance_loss(inputs, targets) term.
     enhance: true
-    enhance_weight: 1.0
+    enhance_weight: 0.5
     enhance_criterion: "l1"
     enhance_reduction: "mean"
 
-    # Adversarial loss weight
-    adversarial_weight: 0.01  # ★ 关键！从0.005提升到0.01，让判别器更有话语权
 
 datasets:
   name: "LOLBlur"
@@ -67,8 +67,25 @@ datasets:
     verbose: true
     n_workers: 4
 
+
 path:
-  save_dir: "./experiments/checkpoints"
-  # 从Baseline最佳权重加载生成器
-  # 注意：代码中已硬编码为 'experiments/checkpoints/baseline_best_lpips.pt'
-  # 如需修改加载路径，请直接修改 train_gan.py 中的 checkpoint_path 变量
+  save_dir: './experiments/checkpoints'
+  resume_path: '../baseline/experiments/checkpoints/baseline_best_psnr.pt'
+
+# Controlled GAN additions. Everything above this marker mirrors
+# training/baseline_continued/options/config.yaml semantically.
+discriminator:
+  input_channels: 3
+  base_channels: 64
+  optimizer: "Adam"
+  lr_initial: 0.0001
+  betas: [0.5, 0.999]
+  weight_decay: 0.0
+  lr_scheme: "CosineAnnealing"
+  eta_min: 0.000001
+
+adversarial:
+  criterion: "mse"          # LSGAN objective, matching the historical GAN family.
+  weight: 0.01
+  real_label: 0.9
+  fake_label: 0.0

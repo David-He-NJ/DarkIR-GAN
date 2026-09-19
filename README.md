@@ -1,125 +1,157 @@
 # DarkIR-GAN
 
-**DarkIR-GAN: GAN-Based Low-Light Blurred Image Restoration**
+Official research code for **DarkIR-GAN: GAN-Based Low-Light Blurred Image Restoration**.
 
-Xinyu He and Shi Yan — School of Information Science and Engineering, Lanzhou University.
+DarkIR-GAN keeps the DarkIR generator and the continued-baseline reconstruction recipe, then adds a five-layer PatchGAN discriminator trained with a least-squares adversarial objective. The repository includes the matched Stage III baseline and adversarial branches used for the paper comparison.
 
-Research code for comparing continued DarkIR training with a perception-oriented GAN fine-tuning recipe. The model combines a DarkIR generator with a five-layer PatchGAN discriminator. Restoration inference uses only the generator.
+## Main result
 
-## Status
+Both branches restore the same Stage II checkpoint, optimizer state and scheduler state, then train for another 30 epochs. The table reports the final checkpoint on the complete 1,800-image LOL-Blur validation split.
 
-This research snapshot has not undergone a clean-environment GPU reproduction test. The historical comparison changes reconstruction weights and optimization settings as well as adversarial supervision, so it does not isolate the causal effect of the adversarial term. `training/gan_controlled/` adds a matched experiment setup; no results are claimed until that setup is trained and evaluated.
+| Method | PSNR ↑ | SSIM ↑ | LPIPS ↓ | MUSIQ ↑ | NIQE ↓ | NRQM ↑ |
+|---|---:|---:|---:|---:|---:|---:|
+| Baseline-continued | 24.803 | **0.8558** | 0.1530 | 55.163 | 5.366 | 5.102 |
+| DarkIR-GAN | **24.940** | 0.8553 | **0.1301** | **60.718** | **4.737** | **5.983** |
 
-See [implementation notes](docs/implementation_notes.md) and [reproduction requirements](docs/reproduction.md).
+The raw ten-point trajectories are in [`results/stage3/`](results/stage3/). Run `python scripts/summarize_stage3.py --check` to verify their hashes, epoch schedule and reported endpoint values.
 
-## Workflow and structure
+This is a single-run controlled comparison. The two branches are matched in configuration, data split, initialization and training budget, but the historical sampler did not record a seed or consumed-sample manifest, so batch-for-batch identity is not claimed.
 
-```text
-Stage I: full-data adaptation (historical entry points in baseline/)
-    |
-Stage II: baseline training (baseline/)
-    |
-    +-- Stage III-A: continued baseline (baseline_continued/)
-    +-- Stage III-B: historical GAN fine-tuning (gan/)
-    +-- Controlled GAN: Stage III-A recipe + adversarial training only (gan_controlled/)
-```
-
-These experiment directories are not four consecutive stages. Stage I has no dedicated one-epoch configuration in the uploaded snapshot.
+## Repository map
 
 ```text
 training/
-├── baseline/
-│   ├── archs/, data/, losses/, options/
-│   ├── train_with_periodic_evaluation.py
-│   ├── train_from_pretrained.py
-│   ├── train_initial.py
-│   ├── train_baseline.py
-│   ├── train_baseline_variant.py
-│   └── evaluate.py
-├── baseline_continued/
-│   └── train_continued.py
-├── gan/
-│   ├── train_gan.py
-│   ├── train_baseline.py
-│   └── MODEL_ARCHITECTURE.md
-└── gan_controlled/
-    ├── train_controlled_gan.py
-    ├── patchgan.py
-    ├── verify_setup.py
-    └── README.md
+├── baseline/                 # Stage I/II historical entry points
+├── baseline_continued/       # Stage III reconstruction-only control
+└── gan/                      # Stage III DarkIR-GAN used in the paper
+results/stage3/               # Full-validation CSVs and audit metadata
+scripts/                      # Release checks, result verification and launch wrapper
+environment/                  # AutoDL runtime version record
+docs/                         # Implementation and reproduction notes
 ```
 
-Stage-specific module copies are retained because implementations differ. The historical `gan/train_baseline.py` has a model-factory call incompatible with the GAN package; it is not the baseline launch command.
+`training/gan/` is the paper implementation. An earlier pre-control prototype
+that changed several generator-side variables is intentionally excluded from
+the public release.
 
 ## Environment
 
-Install a CUDA-compatible PyTorch/torchvision pair and the dependencies in an isolated environment. `requirements.txt` was extracted from imports; it is not the original version lock, and no fresh installation has validated a version combination. Some code paths explicitly require CUDA.
+The completed AutoDL runs used:
+
+- Python 3.10.12
+- PyTorch 2.5.1+cu124
+- torchvision 0.20.1+cu124
+- CUDA 12.4
+- NVIDIA GeForce RTX 4080 SUPER
+
+Install the CUDA build of PyTorch first, then the recorded direct dependencies:
 
 ```bash
-git clone git@github.com:David-He-NJ/DarkIR-GAN.git
-cd DarkIR-GAN
 python -m venv .venv
 source .venv/bin/activate
+pip install torch==2.5.1 torchvision==0.20.1 \
+  --index-url https://download.pytorch.org/whl/cu124
 pip install -r requirements.txt
 ```
 
-## Data and weights
+See [`environment/autodl-cu124.txt`](environment/autodl-cu124.txt) for the versions observed in the completed runs. The local IQA-PyTorch snapshot reported version `0.0.0` and did not preserve its upstream commit identifier; this remaining provenance gap is documented rather than replaced with an invented version.
 
-The configured layout, relative to the repository root, is:
+## Data and required assets
+
+Obtain LOL-Blur under its own distribution terms and use this layout:
 
 ```text
 datasets/LOL-Blur/
 ├── train/
-│   ├── low_blur/<scene_id>/<image>.png
-│   └── high_sharp_original/<scene_id>/<image>.png
+│   ├── low_blur/<scene>/<image>.png
+│   └── high_sharp_original/<scene>/<image>.png
 └── val/
-    ├── low_blur/<scene_id>/<image>.png
-    └── high_sharp_original/<scene_id>/<image>.png
+    ├── low_blur/<scene>/<image>.png
+    └── high_sharp_original/<scene>/<image>.png
 ```
 
-Validate pairing and dimensions before execution. The loader does not force 256×256 resizing. `weights/iqa/` must contain compatible `lpips.pth`, `musiq.pth`, `niqe.mat` and `nrqm.mat` files: they are required by the metric calls, not optional assets. Loss libraries may additionally load pretrained VGG/LPIPS weights.
+The completed runs contained 20,400 training images and 3,600 validation images. The repository does not redistribute the dataset or third-party IQA weights. Model checkpoints are hosted separately from Git; the verified asset manifest and release filenames are documented in [`docs/model_assets.md`](docs/model_assets.md).
 
-Datasets, weights and experiment outputs are excluded from Git.
+Place the metric assets at:
 
-## Entry points
+```text
+weights/iqa/lpips.pth
+weights/iqa/musiq.pth
+weights/iqa/niqe.mat
+weights/iqa/nrqm.mat
+```
 
-Each command starts from the **repository root**, after preparing data, environment, metric weights and initialization. These commands identify entry points; they are not a guarantee of unverified end-to-end execution.
+Place the shared Stage II initialization at:
+
+```text
+training/baseline/experiments/checkpoints/baseline_best_psnr.pt
+```
+
+Its required SHA-256 is:
+
+```text
+dbfdc6494daae9a809607f63e74a6193a8b4ed0004c02ae9f23dda1cfc723a99
+```
+
+Official checkpoint download links will be added here after the external,
+versioned asset release is uploaded. The Git repository remains source-only;
+all `.pt`, `.pth` and `.ckpt` files are intentionally ignored.
+
+## Reproduce Stage III
+
+Run the static release checks first:
 
 ```bash
-# Stage II: inspect resume_path and script overrides first.
-(cd training/baseline && python train_baseline.py)
-
-# Stage III-A.
-(cd training/baseline_continued && python train_continued.py)
-
-# Stage III-B.
-(cd training/gan && python train_gan.py)
-
-# Matched controlled GAN (requires the shared baseline checkpoint).
-(cd training/gan_controlled && python train_controlled_gan.py)
+python scripts/verify_release.py
+python training/gan/verify_setup.py
 ```
 
-Stage III-A defaults to `training/baseline/experiments/checkpoints/baseline_best_psnr.pt`; Stage III-B defaults to the sibling `baseline_best_lpips.pt`. Missing checkpoints can trigger from-scratch training, so check them explicitly.
+Optional bounded GPU smoke tests:
 
-The two supplied Stage-II archives have identical serialized metadata and tensor-storage contents despite different file hashes. This supports a shared available initialization but does not prove what a past process loaded.
+```bash
+python baseline_smoke_test.py --iterations 100 --validation-batches 2
+(cd training/gan && python smoke_test_controlled.py \
+  --iterations 100 --validation-batches 2 --run-name smoke_strict)
+```
 
-The controlled entry point refuses to train if its baseline-controlled YAML sections drift or if the shared initialization is missing. It records the initialization SHA-256 and source/config hashes in a run manifest. See [the controlled experiment notes](training/gan_controlled/README.md).
+Formal Stage III branches:
 
-`baseline/evaluate.py` is a baseline evaluator, not a unified GAN evaluator. A standalone inference interface is not included. Outputs are saved under each stage's `experiments/` directory.
+```bash
+bash scripts/run_stage3.sh baseline
+bash scripts/run_stage3.sh gan
+```
 
-## Implemented objective
+Run the two branches in separate repository copies or move the generated `experiments/` directories between runs. Checkpoints and outputs are intentionally ignored by Git.
 
-Effective GAN coefficients, after including both inner and outer multipliers:
+## Verification status
 
-- Pixel L1: 1.
-- LPIPS: 1.
-- Laplacian residual MSE: 0.01.
-- LSGAN generator loss: 0.01.
+- GitHub source baseline: commit `2f08ba5e73347d4e2e3862f81c156ff5089e00a1`.
+- The AutoDL deployments completed with exit code 0.
+- `baseline_continued` matches the completed AutoDL deployment byte-for-byte.
+- `training/gan/` contains the controlled branch used by the paper. It is
+  relocated from the AutoDL path `training/gan_controlled/`; the verified
+  production and configuration file contents are unchanged.
+- Both branches passed bounded GPU smoke tests before the 30-epoch runs.
+- Each formal run produced ten full validations on all 1,800 validation images.
 
-A historical input–target L1 term contributes to the logged loss but has zero generator gradient. The baseline uses a different reconstruction recipe. See the [full accounting](docs/implementation_notes.md).
+Detailed boundaries and hashes are in [`docs/reproduction.md`](docs/reproduction.md), [`docs/implementation_notes.md`](docs/implementation_notes.md) and [`results/stage3/provenance.json`](results/stage3/provenance.json).
 
-The controlled setup does not reuse that zero-gradient term. It retains the actual continued-baseline reconstruction objective and adds only a `0.01` LSGAN generator term. This is an experiment definition, not a result.
+## Citation
 
-## Acknowledgements and citation
+Citation metadata is provided in [`CITATION.cff`](CITATION.cff). No venue acceptance status or DOI is asserted in this repository.
 
-The generator follows DarkIR; the framework uses PatchGAN/LSGAN concepts and LPIPS-based losses. The manuscript bibliography identifies the underlying work. No acceptance status or venue is asserted. A project license has not been selected; this snapshot does not grant a new blanket license to upstream components.
+## Acknowledgements
+
+The generator implementation builds on
+[DarkIR](https://github.com/cidautai/DarkIR), the official implementation of
+"DarkIR: Robust Low-Light Image Restoration." Please cite the original DarkIR
+work when using this repository. Its retained copyright and license notice is
+provided in [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md).
+
+## License
+
+The original DarkIR-GAN code and documentation in this repository are released
+under the [MIT License](LICENSE). Third-party components retain their original
+copyright and license terms; see [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md).
+The LOL-Blur dataset, IQA model assets and separately hosted checkpoints are not
+relicensed by this repository.

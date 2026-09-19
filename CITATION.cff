@@ -1,0 +1,16 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite the associated DarkIR-GAN paper."
+type: software
+title: "DarkIR-GAN: GAN-Based Low-Light Blurred Image Restoration"
+authors:
+  - family-names: He
+    given-names: Xinyu
+  - family-names: Yan
+    given-names: Shi
+repository-code: "https://github.com/David-He-NJ/DarkIR-GAN"
+license: MIT
+keywords:
+  - low-light image enhancement
+  - image deblurring
+  - generative adversarial networks
+  - image restoration

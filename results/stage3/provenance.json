@@ -1,0 +1,70 @@
+{
+  "source_commit": "2f08ba5e73347d4e2e3862f81c156ff5089e00a1",
+  "release_layout": {
+    "training/gan": "Relocated from the deployed training/gan_controlled directory; verified file contents unchanged."
+  },
+  "initialization_sha256": "dbfdc6494daae9a809607f63e74a6193a8b4ed0004c02ae9f23dda1cfc723a99",
+  "environment": {
+    "python": "3.10.12",
+    "torch": "2.5.1+cu124",
+    "torchvision": "0.20.1+cu124",
+    "cuda": "12.4",
+    "gpu": "NVIDIA GeForce RTX 4080 SUPER"
+  },
+  "source_files": {
+    "training/baseline_continued/train_continued.py": "46cc1a96e0737b979c83ed28aa7a46fab57a453b6ebf789692aad542100a6bf0",
+    "training/baseline_continued/options/config.yaml": "362dd95fbfec85dd58d9a28464233695141fbcc9a5fa42271b57cd1b4bbf9de7",
+    "training/gan/train_controlled_gan.py": "10521b84aef28e2d108f41bb2916160addd0aba18a4668fd93f332f5dcd2d58f",
+    "training/gan/options/config.yaml": "8cb7e8e4752b09853b419010f32e0b5f43f273a700caa3449d8cb40a2df9b18d",
+    "baseline_smoke_test.py": "41ab192b7d6236897d4307a599dde2ac33d9d9343212d6f95b3f6afcf7db6823",
+    "training/gan/smoke_test_controlled.py": "d2956cf026358ffa135a444c2499ed94d8b3bfae058986f27c1a6388a862f838"
+  },
+  "runs": {
+    "baseline_continued": {
+      "status": "COMPLETED",
+      "exit_code": 0,
+      "finished_utc": "2026-09-19T07:18:48Z",
+      "csv": "results/stage3/baseline_continued.csv",
+      "csv_sha256": "5d7c1de75f3cbf8d3a23bf074765c6edf0dc8899ab59fcfe4bd440a41c401899",
+      "smoke_result_sha256": "3cb95acbafb5a5584e94c4838e6ed6764a32214cc2ad805eeeebd91221266f93",
+      "epoch_30_checkpoint_sha256": "a5f01db6e525b1a15f54a1369d77da15ac89c8083fb7094246aebe1d554f9620",
+      "best_psnr_checkpoint_sha256": "844edbdbaad745c27d7b82e9dbcef322c352d0b02cfeb9518cb828cc34b321",
+      "best_lpips_checkpoint_sha256": "e14d1924739968fe221c8b800fe6f4aa0c046bfb8265f7d0753e5e93127d9b19",
+      "full_validation_images": 1800,
+      "full_validation_count": 10,
+      "saved_visualizations": 80
+    },
+    "darkir_gan": {
+      "status": "COMPLETED",
+      "exit_code": 0,
+      "finished_utc": "2026-09-18T06:46:43Z",
+      "csv": "results/stage3/darkir_gan.csv",
+      "csv_sha256": "83d879021d0663c4ccd5df209979db94c26919a964332a49c033a2515d4051fa",
+      "smoke_result_sha256": "083877aa29c57c430649ebe8ff56408939452cb863115e07a7417310cb3bf74f",
+      "epoch_30_checkpoint_sha256": "c3e7d276149a0935b9d92e0466aad60848767f04cc49023e90bc08aa585614bd",
+      "best_psnr_checkpoint_sha256": "0789597348595bb77a704ec4d7700ef4c6be86bb09bd463fa28373d9003897a6",
+      "best_lpips_checkpoint_sha256": "4811df11ded9fc0358fb8b48962844e83780c51306c2bda92710b39779532cf1",
+      "full_validation_images": 1800,
+      "full_validation_count": 10,
+      "saved_visualizations": 80
+    }
+  },
+  "reported_final": {
+    "baseline_continued": {
+      "val_psnr": 24.80278309557173,
+      "val_ssim": 0.8557857573032379,
+      "val_lpips": 0.15298598081804812,
+      "val_musiq": 55.16344760576884,
+      "val_nrqm": 5.101539598438475,
+      "val_niqe": 5.365740796802386
+    },
+    "darkir_gan": {
+      "val_psnr": 24.940083878305224,
+      "val_ssim": 0.8552909866968791,
+      "val_lpips": 0.13013968411005206,
+      "val_musiq": 60.71757359186808,
+      "val_nrqm": 5.983081814977858,
+      "val_niqe": 4.7370606501300365
+    }
+  }
+}

@@ -1,41 +1,54 @@
-# Reproduction requirements
+# Reproduction record
 
-## Verified scope
+## Authoritative Stage III source
 
-The remote upload, Python syntax and YAML parsing were checked. Documentation was compared with the manuscript, source and aggregate CSVs. No clean-environment GPU execution or metric recomputation was performed.
+The completed AutoDL deployments identify GitHub commit `2f08ba5e73347d4e2e3862f81c156ff5089e00a1` as their source.
 
-## Historical stages
+File-level SHA-256 comparison established:
 
-1. Stage I is described as one full-data epoch. train_from_pretrained.py and train_with_periodic_evaluation.py request full training images but use configuration-driven epoch counts. Neither currently has a dedicated one-epoch configuration. The original entry point and Stage-I log remain to be confirmed.
-2. Stage II uses a baseline initialization and the baseline training routines. An additional variant is retained; selecting an arbitrary variant does not prove reproduction of the CSV.
-3. Stage III has separate baseline_continued and gan branches, with different effective settings.
+- `training/baseline_continued/` is byte-identical between GitHub and the completed AutoDL baseline deployment.
+- The public `training/gan/` directory is the paper's controlled branch. It
+  relocates the deployed `training/gan_controlled/` directory without changing
+  the verified production script, configuration or smoke-test contents.
+- The earlier pre-control GAN prototype is omitted because it changed multiple
+  generator-side variables and was not used for the reported comparison.
 
-## Before future execution
+No training recipe was reconstructed from prose after the run. The release
+preserves the source that was actually deployed; `results/stage3/provenance.json`
+records the relocated release paths and the original file hashes.
 
-- Recover original Python/CUDA/PyTorch/torchvision/LPIPS/pyiqa versions and metric-weight hashes. requirements.txt is not a version lock.
-- Validate paired filenames, dimensions and full/quick-validation counts. The loader does not enforce the previously claimed 256×256 evaluation resolution.
-- Ensure initialization files exist; missing paths can trigger from-scratch fallback.
-- Freeze the chosen source revision and effective runtime settings, including script overrides.
-- Check actual sampling: the sampler updates its own paths, but the dataset retains paths captured at construction. set_epoch alone does not establish new images were consumed.
-- Check LPIPS conventions separately for training loss and the validation wrapper.
-- Record metric failures. The historical wrapper catches exceptions and retains zero defaults; aggregate logs do not report failure counts.
-- Check checkpoint formats. baseline/evaluate.py is not a general GAN evaluator.
+## Completed runs
 
-## Remaining evidence
+| Branch | Status | Finished UTC | Full validations | Output images |
+|---|---|---|---:|---:|
+| Baseline-continued | exit code 0 | 2026-09-19 07:18:48 | 10 × 1,800 images | 80 |
+| DarkIR-GAN | exit code 0 | 2026-09-18 06:46:43 | 10 × 1,800 images | 80 |
 
-Matched ablations, repeated-seed variation, failure counts and clean-environment reproduction cannot be established by editing prose. Some evaluation questions may be answered from old outputs/checkpoints without retraining, but no such evaluation was run in this revision.
+Both runs restored the same initialization:
 
-## Controlled adversarial ablation
-
-The matched setup is under `training/gan_controlled/`. Before allocating GPU time:
-
-```bash
-python training/gan_controlled/verify_setup.py
-python -m compileall -q training/gan_controlled
+```text
+dbfdc6494daae9a809607f63e74a6193a8b4ed0004c02ae9f23dda1cfc723a99
 ```
 
-Then place the shared Stage-II initialization at `training/baseline/experiments/checkpoints/baseline_best_psnr.pt` and launch from the controlled directory. The run aborts rather than falling back to random initialization and records the initialization SHA-256 in `training/gan_controlled/experiments/run_manifest.json`.
+The controlled manifest recorded generator optimizer learning rate `1e-6` and scheduler `last_epoch=30` after restoration. The discriminator was randomly initialized for the adversarial branch.
 
-After training, run baseline and controlled-GAN generator checkpoints through the same strict evaluator. Record metric failure counts; do not use silent zero substitution as evidence. The historical sampler does not provide proof of identical batch order, so describe the comparison as matched in dataset/split, loader behavior, training length, and generator recipe—not as batch-identical.
+The full-validation CSVs and their audit hashes are retained under `results/stage3/`. Large checkpoints, TensorBoard events, dataset files and third-party metric weights are not committed. Checkpoints are distributed separately using the filenames and SHA-256 identities in [`model_assets.md`](model_assets.md).
 
-Historical code semantics and logs are preserved. Future fixes and measurements should use a separately identified experiment revision.
+## Before running
+
+1. Install the recorded environment or an explicitly documented alternative.
+2. Validate the dataset layout and the 20,400/3,600 train/validation image counts.
+3. Place all four IQA metric files under `weights/iqa/`.
+4. Place the shared Stage II initialization at the documented path and verify its SHA-256.
+5. Run `python scripts/verify_release.py` and `python training/gan/verify_setup.py`.
+6. Run a bounded GPU smoke test before allocating a full run.
+
+## Remaining limitations
+
+- The comparison is single-run. Repeated seeds, confidence intervals and paired per-image statistics are not available.
+- The sampler updates its own paths after the dataset has captured initial path lists. Dataset, split, loader behavior and training length are matched, but batch order is not proven identical.
+- The historical metric wrapper catches metric exceptions and can retain zero defaults. The completed CSVs are non-zero, and smoke tests exercised explicit metric calls, but per-image failure counts were not logged.
+- The IQA-PyTorch checkout used on AutoDL was installed from an unversioned local snapshot reporting `0.0.0`; its exact upstream commit was not preserved.
+- The repository does not redistribute LOL-Blur or third-party IQA weights. Initialization and result checkpoints are separately hosted rather than committed to Git.
+
+These boundaries should remain attached to any quantitative claim derived from this repository.
