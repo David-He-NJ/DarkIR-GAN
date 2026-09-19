@@ -93,9 +93,24 @@ Its required SHA-256 is:
 dbfdc6494daae9a809607f63e74a6193a8b4ed0004c02ae9f23dda1cfc723a99
 ```
 
-Official checkpoint download links will be added here after the external,
-versioned asset release is uploaded. The Git repository remains source-only;
-all `.pt`, `.pth` and `.ckpt` files are intentionally ignored.
+## Model checkpoints
+
+The seven verified checkpoint files are hosted separately in the
+[`v1.0.0` model release](https://github.com/David-He-NJ/DarkIR-GAN/releases/tag/v1.0.0):
+
+| Artifact | Download |
+|---|---|
+| Shared Stage II initialization | [`darkir_stage2_init_baseline_best_psnr.pt`](https://github.com/David-He-NJ/DarkIR-GAN/releases/download/v1.0.0/darkir_stage2_init_baseline_best_psnr.pt) |
+| Stage III baseline, epoch 30 | [`darkir_stage3_baseline_epoch_30.pt`](https://github.com/David-He-NJ/DarkIR-GAN/releases/download/v1.0.0/darkir_stage3_baseline_epoch_30.pt) |
+| Stage III baseline, best PSNR | [`darkir_stage3_baseline_best_psnr.pt`](https://github.com/David-He-NJ/DarkIR-GAN/releases/download/v1.0.0/darkir_stage3_baseline_best_psnr.pt) |
+| Stage III baseline, best LPIPS | [`darkir_stage3_baseline_best_lpips.pt`](https://github.com/David-He-NJ/DarkIR-GAN/releases/download/v1.0.0/darkir_stage3_baseline_best_lpips.pt) |
+| Stage III DarkIR-GAN, epoch 30 | [`darkir_gan_stage3_epoch_30.pt`](https://github.com/David-He-NJ/DarkIR-GAN/releases/download/v1.0.0/darkir_gan_stage3_epoch_30.pt) |
+| Stage III DarkIR-GAN, best PSNR | [`darkir_gan_stage3_best_psnr.pt`](https://github.com/David-He-NJ/DarkIR-GAN/releases/download/v1.0.0/darkir_gan_stage3_best_psnr.pt) |
+| Stage III DarkIR-GAN, best LPIPS | [`darkir_gan_stage3_best_lpips.pt`](https://github.com/David-He-NJ/DarkIR-GAN/releases/download/v1.0.0/darkir_gan_stage3_best_lpips.pt) |
+
+The Git repository remains source-only; all `.pt`, `.pth` and `.ckpt` files
+are intentionally ignored. Verify downloads against
+[`docs/model_assets.md`](docs/model_assets.md) before use.
 
 ## Reproduce Stage III
 

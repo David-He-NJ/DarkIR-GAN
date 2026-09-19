@@ -2,8 +2,9 @@
 
 Model checkpoints are distributed separately from the Git repository. Keeping
 the binaries outside Git makes the source history reviewable and avoids
-duplicating multi-gigabyte training artifacts. Official download links will be
-added to the main README when the external release is uploaded.
+duplicating multi-gigabyte training artifacts. The verified files are published
+as the [`v1.0.0` GitHub Release](https://github.com/David-He-NJ/DarkIR-GAN/releases/tag/v1.0.0),
+with direct download links in the main README.
 
 Each published file must be verified against the SHA-256 value below before it
 is used. The suggested release filenames are unique so that the Stage II
@@ -24,10 +25,10 @@ to `baseline_best_psnr.pt`, and place it at the runtime path shown above. The
 other six checkpoints are release/evaluation artifacts and are not required to
 start the matched Stage III training runs.
 
-Recommended publication procedure:
+Release maintenance procedure:
 
-1. Upload the seven files to a versioned external release with stable URLs.
+1. Upload replacement files only under a new versioned release tag.
 2. Verify every remote download with `shasum -a 256 <filename>`.
-3. Add the download URL and archive version to the main README.
+3. Update the download URLs, hashes and archive version together.
 4. Keep all `.pt`, `.pth` and `.ckpt` files outside Git; the release checker
    rejects checkpoint binaries in the source package.

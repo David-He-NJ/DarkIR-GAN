@@ -79,6 +79,11 @@ def main():
         raise RuntimeError("README does not identify the project license")
     if "docs/model_assets.md" not in readme:
         raise RuntimeError("README does not link the separate asset manifest")
+    release_url = "https://github.com/David-He-NJ/DarkIR-GAN/releases/tag/v1.0.0"
+    if release_url not in readme:
+        raise RuntimeError("README does not link the v1.0.0 model release")
+    if PROVENANCE.get("model_release", {}).get("url") != release_url:
+        raise RuntimeError("Provenance does not identify the v1.0.0 model release")
 
     for relative_path, expected in PROVENANCE["source_files"].items():
         path = ROOT / relative_path

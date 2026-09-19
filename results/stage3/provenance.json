@@ -3,6 +3,10 @@
   "release_layout": {
     "training/gan": "Relocated from the deployed training/gan_controlled directory; verified file contents unchanged."
   },
+  "model_release": {
+    "tag": "v1.0.0",
+    "url": "https://github.com/David-He-NJ/DarkIR-GAN/releases/tag/v1.0.0"
+  },
   "initialization_sha256": "dbfdc6494daae9a809607f63e74a6193a8b4ed0004c02ae9f23dda1cfc723a99",
   "environment": {
     "python": "3.10.12",
