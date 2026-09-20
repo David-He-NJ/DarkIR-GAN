@@ -5,7 +5,7 @@ These CSVs are the complete scheduled validation records from the two completed 
 - `baseline_continued.csv`: reconstruction-only continuation.
 - `darkir_gan.csv`: the matched continuation plus PatchGAN/LSGAN supervision.
 
-Each file contains evaluations at epochs 3, 6, 9, ..., 30 on all 1,800 validation images. `provenance.json` records source, initialization, CSV, smoke-result and checkpoint hashes.
+Each file contains evaluations at epochs 3, 6, 9, ..., 30 on all 1,800 validation images. `provenance.json` records source, initialization, CSV and checkpoint hashes.
 
 Verify and summarize the files with:
 
