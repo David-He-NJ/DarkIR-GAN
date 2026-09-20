@@ -121,13 +121,6 @@ python scripts/verify_release.py
 python training/gan/verify_setup.py
 ```
 
-Optional bounded GPU smoke tests:
-
-```bash
-python baseline_smoke_test.py --iterations 100 --validation-batches 2
-(cd training/gan && python smoke_test_controlled.py \
-  --iterations 100 --validation-batches 2 --run-name smoke_strict)
-```
 
 Formal Stage III branches:
 
@@ -146,7 +139,6 @@ Run the two branches in separate repository copies or move the generated `experi
 - `training/gan/` contains the controlled branch used by the paper. It is
   relocated from the AutoDL path `training/gan_controlled/`; the verified
   production and configuration file contents are unchanged.
-- Both branches passed bounded GPU smoke tests before the 30-epoch runs.
 - Each formal run produced ten full validations on all 1,800 validation images.
 
 Detailed boundaries and hashes are in [`docs/reproduction.md`](docs/reproduction.md), [`docs/implementation_notes.md`](docs/implementation_notes.md) and [`results/stage3/provenance.json`](results/stage3/provenance.json).
