@@ -8,8 +8,8 @@ File-level SHA-256 comparison established:
 
 - `training/baseline_continued/` is byte-identical between GitHub and the completed AutoDL baseline deployment.
 - The public `training/gan/` directory is the paper's controlled branch. It
-  relocates the deployed `training/gan_controlled/` directory without changing
-  the verified production script, configuration or smoke-test contents.
+  relocates the deployed `training/gan_controlled/` directory while preserving
+  the training configuration and optimization logic used for the reported run.
 - The earlier pre-control GAN prototype is omitted because it changed multiple
   generator-side variables and was not used for the reported comparison.
 
@@ -41,13 +41,12 @@ The full-validation CSVs and their audit hashes are retained under `results/stag
 3. Place all four IQA metric files under `weights/iqa/`.
 4. Place the shared Stage II initialization at the documented path and verify its SHA-256.
 5. Run `python scripts/verify_release.py` and `python training/gan/verify_setup.py`.
-6. Run a bounded GPU smoke test before allocating a full run.
 
 ## Remaining limitations
 
 - The comparison is single-run. Repeated seeds, confidence intervals and paired per-image statistics are not available.
 - The sampler updates its own paths after the dataset has captured initial path lists. Dataset, split, loader behavior and training length are matched, but batch order is not proven identical.
-- The historical metric wrapper catches metric exceptions and can retain zero defaults. The completed CSVs are non-zero, and smoke tests exercised explicit metric calls, but per-image failure counts were not logged.
+- The historical metric wrapper catches metric exceptions and can retain zero defaults. The completed CSVs are non-zero, but per-image failure counts were not logged.
 - The IQA-PyTorch checkout used on AutoDL was installed from an unversioned local snapshot reporting `0.0.0`; its exact upstream commit was not preserved.
 - The repository does not redistribute LOL-Blur or third-party IQA weights. Initialization and result checkpoints are separately hosted rather than committed to Git.
 
