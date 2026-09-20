@@ -29,7 +29,6 @@ REQUIRED = (
     "training/gan/README.md",
     "training/gan/options/config.yaml",
     "training/gan/patchgan.py",
-    "training/gan/smoke_test_controlled.py",
     "training/gan/train_controlled_gan.py",
     "training/gan/verify_setup.py",
 )
