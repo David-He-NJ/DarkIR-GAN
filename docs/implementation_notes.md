@@ -45,8 +45,8 @@ commit was not preserved; this is a dependency-provenance limitation rather
 than a substituted version claim.
 
 The historical metric wrapper can retain zero defaults after metric exceptions.
-The completed Stage III CSVs are non-zero, and the bounded smoke tests exercised
-explicit metric calls, but per-image exception counts were not logged.
+The completed Stage III CSVs are non-zero, but per-image exception counts were
+not logged.
 
 ## Reproducibility boundary
 
