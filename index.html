@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DarkIR-GAN: GAN-Based Low-Light Blurred Image Restoration</title>
+  <meta name="description" content="DarkIR-GAN adds adversarial supervision to DarkIR for joint low-light enhancement and motion deblurring. Xinyu He and Shi Yan. Accepted at VSIP 2026.">
+  <meta name="theme-color" content="#ffffff">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="DarkIR-GAN">
+  <meta property="og:description" content="GAN-Based Low-Light Blurred Image Restoration · Accepted at VSIP 2026">
+  <meta property="og:url" content="https://david-he-nj.github.io/DarkIR-GAN/">
+  <meta property="og:image" content="https://david-he-nj.github.io/DarkIR-GAN/assets/social.jpg">
+  <link rel="canonical" href="https://david-he-nj.github.io/DarkIR-GAN/">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#abstract">Skip to abstract</a>
+  <header class="paper-header">
+    <p class="venue">Accepted at VSIP 2026</p>
+    <h1><span class="project-name">DarkIR-GAN</span><span class="paper-title">GAN-Based Low-Light Blurred<br class="desktop-break"> Image Restoration</span></h1>
+    <p class="authors">Xinyu He <span class="author-separator">&nbsp; &nbsp;</span> Shi Yan<sup>†</sup></p>
+    <p class="affiliation">School of Information Science and Engineering, Lanzhou University</p>
+    <p class="corresponding">† Corresponding author</p>
+    <div class="resource-links">
+      <a class="resource" href="assets/DarkIR-GAN.pdf" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h8l4 4v14H6zM14 3v5h4M9 12h6M9 16h6"/></svg>Paper <span class="button-detail">(author manuscript)</span></a>
+      <a class="resource" href="https://github.com/David-He-NJ/DarkIR-GAN" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 7-5 5 5 5m8-10 5 5-5 5m-3-12-2 18"/></svg>GitHub</a>
+    </div>
+  </header>
+
+  <main>
+    <figure class="teaser content-wide" aria-labelledby="teaser-caption">
+      <div class="comparison">
+        <div><p class="image-label">Input</p><img id="input-image" src="assets/street-input.webp" alt="Dark, motion-blurred street scene" width="1120" height="640" fetchpriority="high"></div>
+        <div><p class="image-label ours-label">Our Result</p><div class="result-frame" id="result-frame" aria-busy="false">
+          <img id="gan-image" src="assets/street-gan.webp" alt="Street scene restored by DarkIR-GAN" width="1120" height="640" hidden>
+          <div id="result-placeholder"><svg id="reveal-icon" viewBox="0 0 32 32" aria-hidden="true"><path d="M5 7h22v18H5zM5 21l7-7 6 6 4-4 5 5M21 11h.01"/></svg><span id="result-hint">Ready to see the difference?</span><span class="spinner" id="result-spinner" hidden aria-label="Loading result"></span></div>
+        </div></div>
+      </div>
+      <div class="scene-picker" role="group" aria-label="Choose a qualitative example">
+        <button type="button" data-scene="street" aria-pressed="true">Street</button>
+        <button type="button" data-scene="shop" aria-pressed="false">Shop</button>
+        <button type="button" data-scene="posters" aria-pressed="false">Posters</button>
+        <button type="button" data-scene="map" aria-pressed="false">Map</button>
+      </div>
+      <div class="reveal-control"><button type="button" id="reveal-result">Show result <span aria-hidden="true">→</span></button></div>
+      <p class="sr-only" id="reveal-status" role="status" aria-live="polite"></p>
+      <noscript><p class="no-script">Enable JavaScript to reveal the result images.</p></noscript>
+      <figcaption id="teaser-caption">Bringing light and detail back to dark, blurred images.</figcaption>
+    </figure>
+
+    <section id="abstract" class="text-section">
+      <h2>Abstract</h2>
+      <p>Low illumination and motion blur severely constrain visual perception in extreme environments. Existing reconstruction-oriented networks often suppress fine local structure when minimizing distortion losses. We propose <strong>DarkIR-GAN</strong>, a generative adversarial framework for joint low-light enhancement and deblurring. It retains the DarkIR generator and its reconstruction objective, and adds only a PatchGAN discriminator with least-squares adversarial supervision. The baseline-continued and adversarial branches restore the same Stage-II generator, optimizer, and scheduler states and are each trained for 30 additional epochs. On the complete 1,800-pair LOL-Blur evaluation set, DarkIR-GAN improves LPIPS, MUSIQ, NIQE, and NRQM, while PSNR and SSIM remain numerically close to the continued baseline. The reported experiment shows improved perceptual-quality metrics with nearly unchanged distortion fidelity.</p>
+    </section>
+
+    <section class="method content-wide" aria-labelledby="method-heading">
+      <h2 id="method-heading">Method</h2>
+      <p class="section-intro">Keep the restoration backbone. Add local adversarial supervision.</p>
+      <figure>
+        <a class="figure-link" href="assets/architecture.webp" target="_blank" rel="noopener" aria-label="Open the full-resolution architecture figure"><img src="assets/architecture.webp" alt="DarkIR-GAN architecture: an unchanged DarkIR generator with reconstruction losses and a five-layer PatchGAN discriminator providing adversarial supervision" width="2432" height="1294" loading="lazy"></a>
+        <figcaption>DarkIR-GAN combines the DarkIR generator with a five-layer PatchGAN discriminator.<br>The two Stage-III branches share initialization, reconstruction losses, and a 30-epoch training budget.</figcaption>
+      </figure>
+    </section>
+
+    <section class="results content-wide" aria-labelledby="results-heading">
+      <h2 id="results-heading">Results on LOL-Blur</h2>
+      <p class="section-intro">Final epoch-30 checkpoints · 1,800 image pairs</p>
+      <div class="table-scroll" role="region" aria-label="Quantitative results, scroll horizontally on smaller screens" tabindex="0">
+        <table>
+          <caption class="sr-only">DarkIR-GAN at the final Stage-III checkpoint. Arrows indicate the preferred metric direction.</caption>
+          <thead><tr><th scope="col">Method</th><th scope="col">PSNR ↑</th><th scope="col">SSIM ↑</th><th scope="col">LPIPS ↓</th><th scope="col">MUSIQ ↑</th><th scope="col">NIQE ↓</th><th scope="col">NRQM ↑</th></tr></thead>
+          <tbody>
+            <tr class="ours-row"><th scope="row">DarkIR-GAN</th><td><strong>24.940</strong></td><td>0.8553</td><td><strong>0.1301</strong></td><td><strong>60.718</strong></td><td><strong>4.737</strong></td><td><strong>5.983</strong></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="result-summary">Improved perceptual-quality metrics with nearly unchanged distortion fidelity in the reported experiment.</p>
+      <p class="result-note">A single-run controlled comparison. These are final-checkpoint results, rather than independently selected best checkpoints. See the manuscript for the full protocol and limitations.</p>
+
+    </section>
+
+    <section class="citation text-section" aria-labelledby="citation-heading">
+      <div class="citation-heading"><h2 id="citation-heading">Citation</h2><button id="copy-citation" type="button">Copy BibTeX</button></div>
+      <pre><code id="bibtex">@unpublished{he2026darkirgan,
+  title  = {DarkIR-GAN: GAN-Based Low-Light Blurred
+            Image Restoration},
+  author = {He, Xinyu and Yan, Shi},
+  year   = {2026},
+  note   = {Accepted at VSIP 2026; author manuscript},
+  url    = {https://david-he-nj.github.io/DarkIR-GAN/}
+}</code></pre>
+      <p id="copy-status" class="sr-only" role="status" aria-live="polite"></p>
+    </section>
+  </main>
+  <footer><p>Built on <a href="https://github.com/cidautai/DarkIR" target="_blank" rel="noopener">DarkIR</a>. All figures and results on this page are from the DarkIR-GAN manuscript.</p></footer>
+</body>
+</html>
