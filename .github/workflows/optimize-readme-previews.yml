@@ -72,8 +72,8 @@ jobs:
           readme = readme_file.read_text(encoding="utf-8")
           for name in names:
               # Rewrite the visible thumbnail only; the architecture link still opens its full-size original.
-              pattern = rf"(!\\[[^\\]]*\\]\\()assets/{re.escape(name)}\\.webp(\\))"
-              readme, changed = re.subn(pattern, rf"\\g<1>assets/preview/{name}.webp\\g<2>", readme)
+              pattern = rf"(!\[[^\]]*\]\()assets/{re.escape(name)}\.webp(\))"
+              readme, changed = re.subn(pattern, rf"\g<1>assets/preview/{name}.webp\g<2>", readme)
               assert changed == 1, f"Expected one README image occurrence for {name}: got {changed}"
           assert "## Main result" in readme and "## Reproduce Stage III" in readme
           readme_file.write_text(readme, encoding="utf-8")
