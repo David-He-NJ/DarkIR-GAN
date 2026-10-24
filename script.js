@@ -7,34 +7,57 @@ const revealIcon=document.getElementById('reveal-icon');
 const revealButton=document.getElementById('reveal-result');
 const frame=document.getElementById('result-frame');
 const status=document.getElementById('reveal-status');
-let request=0;
-function resetResult(){
-  request++;
-  resultImage.hidden=true;placeholder.hidden=false;spinner.hidden=true;
-  hint.hidden=false;revealIcon.removeAttribute('hidden');hint.textContent='Ready to see the difference?';
-  revealButton.disabled=false;revealButton.innerHTML='Show result <span aria-hidden="true">→</span>';
-  frame.setAttribute('aria-busy','false');status.textContent='';
+const generatedScenes=new Set();
+const pendingGenerations=new Map();
+let activeScene='street';
+function renderResult(){
+  const ready=generatedScenes.has(activeScene);
+  const waiting=pendingGenerations.has(activeScene);
+  resultImage.hidden=!ready;
+  placeholder.hidden=ready;
+  spinner.hidden=!waiting;
+  hint.hidden=waiting;
+  revealIcon.toggleAttribute('hidden',waiting);
+  hint.textContent='Ready to see the difference?';
+  revealButton.disabled=ready||waiting;
+  revealButton.textContent=waiting?'Generating…':'Generate';
+  revealButton.setAttribute('aria-busy',String(waiting));
+  frame.setAttribute('aria-busy',String(waiting));
+  status.textContent=ready?'DarkIR-GAN result displayed.':waiting?'Loading result.':'';
 }
 document.querySelectorAll('[data-scene]').forEach(button=>button.addEventListener('click',()=>{
-  const scene=button.dataset.scene;resetResult();
+  activeScene=button.dataset.scene;
   for(const kind of ['input','gan']){
-    const img=document.getElementById(`${kind}-image`);img.src=`assets/${scene}-${kind}.webp`;
-    img.alt=kind==='input'?`Dark, motion-blurred ${scenes[scene]}`:`${scenes[scene]} restored by DarkIR-GAN`;
+    const img=document.getElementById(`${kind}-image`);
+    img.src=`assets/${activeScene}-${kind}.webp`;
+    img.alt=kind==='input'?`Dark, motion-blurred ${scenes[activeScene]}`:`${scenes[activeScene]} restored by DarkIR-GAN`;
   }
   document.querySelectorAll('[data-scene]').forEach(item=>item.setAttribute('aria-pressed',String(item===button)));
+  renderResult();
 }));
 revealButton.addEventListener('click',async()=>{
-  const current=++request;
-  resultImage.hidden=true;placeholder.hidden=false;spinner.hidden=false;hint.hidden=true;revealIcon.setAttribute('hidden','');
-  revealButton.disabled=true;revealButton.textContent='Please wait…';frame.setAttribute('aria-busy','true');status.textContent='Loading result.';
+  const scene=activeScene;
+  if(generatedScenes.has(scene)||pendingGenerations.has(scene))return;
+  const image=new Image();
+  image.src=`assets/${scene}-gan.webp`;
+  const generation=Promise.all([new Promise(resolve=>setTimeout(resolve,300)),image.decode()]);
+  pendingGenerations.set(scene,generation);
+  renderResult();
+  let failed=false;
   try{
-    await Promise.all([new Promise(resolve=>setTimeout(resolve,300)),resultImage.decode()]);
-    if(current!==request)return;
-    resultImage.hidden=false;placeholder.hidden=true;frame.setAttribute('aria-busy','false');
-    revealButton.disabled=false;revealButton.textContent='Show again ↻';status.textContent='DarkIR-GAN result displayed.';
+    await generation;
+    generatedScenes.add(scene);
   }catch{
-    if(current!==request)return;
-    resetResult();hint.textContent='Image could not load. Please try again.';status.textContent='Result could not load. Please try again.';
+    failed=true;
+  }finally{
+    pendingGenerations.delete(scene);
+    if(activeScene===scene){
+      renderResult();
+      if(failed){
+        hint.textContent='Image could not load. Please try again.';
+        status.textContent='Result could not load. Please try again.';
+      }
+    }
   }
 });
 document.getElementById('copy-citation').addEventListener('click',async()=>{
