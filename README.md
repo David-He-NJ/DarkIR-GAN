@@ -16,15 +16,11 @@ A representative comparison from the [interactive project gallery](https://david
 
 | Low-light blurred input | Restored by DarkIR-GAN |
 |:---:|:---:|
-| <img src="https://david-he-nj.github.io/DarkIR-GAN/assets/street-input.webp" alt="Dark, motion-blurred street scene before restoration" width="450"> | <img src="https://david-he-nj.github.io/DarkIR-GAN/assets/street-gan.webp" alt="The same street scene restored by DarkIR-GAN" width="450"> |
+| ![Dark, motion-blurred street scene before restoration](assets/street-input.webp) | ![The same street scene restored by DarkIR-GAN](assets/street-gan.webp) |
 
 ### Architecture
 
-<p align="center">
-  <a href="https://david-he-nj.github.io/DarkIR-GAN/assets/architecture.webp">
-    <img src="https://david-he-nj.github.io/DarkIR-GAN/assets/architecture.webp" alt="DarkIR-GAN architecture: DarkIR generator with the original reconstruction losses and an additional five-layer PatchGAN discriminator for adversarial training" width="900">
-  </a>
-</p>
+[![DarkIR-GAN architecture: DarkIR generator and five-layer PatchGAN discriminator](assets/architecture.webp)](assets/architecture.webp)
 
 DarkIR-GAN preserves the **DarkIR generator and its reconstruction losses**, then adds a **five-layer PatchGAN discriminator** with a least-squares adversarial objective. Only the generator is needed for restoration at inference time. See [implementation notes](docs/implementation_notes.md) for the controlled setup and loss coefficients.
 
@@ -49,9 +45,9 @@ Additional examples from the [project page](https://david-he-nj.github.io/DarkIR
 
 | Scene | Low-light blurred input | DarkIR-GAN output |
 |:---|:---:|:---:|
-| Shop | <img src="https://david-he-nj.github.io/DarkIR-GAN/assets/shop-input.webp" alt="Low-light blurred shop scene" width="350"> | <img src="https://david-he-nj.github.io/DarkIR-GAN/assets/shop-gan.webp" alt="Shop scene restored by DarkIR-GAN" width="350"> |
-| Posters | <img src="https://david-he-nj.github.io/DarkIR-GAN/assets/posters-input.webp" alt="Low-light blurred posters scene" width="350"> | <img src="https://david-he-nj.github.io/DarkIR-GAN/assets/posters-gan.webp" alt="Posters scene restored by DarkIR-GAN" width="350"> |
-| Map | <img src="https://david-he-nj.github.io/DarkIR-GAN/assets/map-input.webp" alt="Low-light blurred map scene" width="350"> | <img src="https://david-he-nj.github.io/DarkIR-GAN/assets/map-gan.webp" alt="Map scene restored by DarkIR-GAN" width="350"> |
+| Shop | ![Low-light blurred shop scene](assets/shop-input.webp) | ![Shop scene restored by DarkIR-GAN](assets/shop-gan.webp) |
+| Posters | ![Low-light blurred posters scene](assets/posters-input.webp) | ![Posters scene restored by DarkIR-GAN](assets/posters-gan.webp) |
+| Map | ![Low-light blurred map scene](assets/map-input.webp) | ![Map scene restored by DarkIR-GAN](assets/map-gan.webp) |
 
 The full interactive comparison and the paper are available on the [project website](https://david-he-nj.github.io/DarkIR-GAN/). These visual examples supplement, rather than replace, the full-validation metrics and reproducibility records below.
 
