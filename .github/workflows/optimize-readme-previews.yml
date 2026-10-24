@@ -1,0 +1,92 @@
+name: Optimize README preview images
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/optimize-readme-previews.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  optimize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install Pillow
+        run: python -m pip install --disable-pip-version-check Pillow
+      - name: Create compressed preview images
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from PIL import Image
+          import re
+
+          root = Path("assets")
+          previews = root / "preview"
+          previews.mkdir(parents=True, exist_ok=True)
+          names = [
+              "architecture",
+              "street-input", "street-gan",
+              "shop-input", "shop-gan",
+              "posters-input", "posters-gan",
+              "map-input", "map-gan",
+          ]
+          total_before = total_after = 0
+          for name in names:
+              source = root / f"{name}.webp"
+              destination = previews / source.name
+              assert source.is_file(), f"Missing original image: {source}"
+              target_bytes = 250_000 if name == "architecture" else 90_000
+              widths = [1400, 1200, 1000] if name == "architecture" else [800, 720, 640, 560]
+              best = None
+              with Image.open(source) as original:
+                  image = original.convert("RGB")
+                  for width in widths:
+                      resized = image.copy()
+                      resized.thumbnail((width, width * 2), Image.Resampling.LANCZOS)
+                      for quality in [82, 76, 70, 64, 58]:
+                          resized.save(destination, "WEBP", quality=quality, method=6)
+                          size = destination.stat().st_size
+                          if best is None or size < best[0]:
+                              best = (size, destination.read_bytes(), resized.size, quality)
+                          if size <= target_bytes:
+                              break
+                      if size <= target_bytes:
+                          break
+              if destination.stat().st_size > target_bytes:
+                  destination.write_bytes(best[1])
+              before, after = source.stat().st_size, destination.stat().st_size
+              total_before += before
+              total_after += after
+              print(f"{name}: {before:,} -> {after:,} bytes")
+
+          readme_file = Path("README.md")
+          readme = readme_file.read_text(encoding="utf-8")
+          for name in names:
+              # Rewrite the visible thumbnail only; the architecture link still opens its full-size original.
+              pattern = rf"(!\\[[^\\]]*\\]\\()assets/{re.escape(name)}\\.webp(\\))"
+              readme, changed = re.subn(pattern, rf"\\g<1>assets/preview/{name}.webp\\g<2>", readme)
+              assert changed == 1, f"Expected one README image occurrence for {name}: got {changed}"
+          assert "## Main result" in readme and "## Reproduce Stage III" in readme
+          readme_file.write_text(readme, encoding="utf-8")
+          print(f"TOTAL: {total_before:,} -> {total_after:,} bytes")
+          assert total_after < 1_100_000, "Preview image payload did not meet the size budget"
+          PY
+      - name: Commit optimized previews (remove one-time workflow)
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm -- .github/workflows/optimize-readme-previews.yml
+          git add README.md assets/preview/
+          git diff --cached --check
+          git commit -m "docs: serve lightweight README previews while retaining original figures"
+          git push origin HEAD:main
