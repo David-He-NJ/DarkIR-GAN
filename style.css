@@ -19,3 +19,5 @@
 @media(prefers-reduced-motion:reduce){.spinner{animation:none}}
 
 .table-heading{font-size:21px;font-weight:600;line-height:1.4;letter-spacing:-.3px;text-align:center;margin:0 0 20px}.benchmark{margin-top:44px}.benchmark-table .category-row th{font-size:12px;font-weight:500;font-style:italic;text-align:left;color:#73777e;background:#f8f9fa;padding:9px 12px;border-top:1px solid #d8dce1}.benchmark-table u{text-underline-offset:3px}.results .result-note a{white-space:nowrap}@media(max-width:700px){.table-heading{font-size:19px}.benchmark{margin-top:34px}}
+
+.author-contact{font-size:14px;margin-top:8px;overflow-wrap:anywhere}
