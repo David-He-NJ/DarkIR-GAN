@@ -13,7 +13,7 @@
   <meta property="og:image" content="https://david-he-nj.github.io/DarkIR-GAN/assets/social.jpg">
   <link rel="canonical" href="https://david-he-nj.github.io/DarkIR-GAN/">
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="style.css?v=generate-memory-1">
+  <link rel="stylesheet" href="style.css?v=result-tables-1">
   <script src="script.js?v=generate-memory-1" defer></script>
 </head>
 <body>
@@ -67,19 +67,46 @@
 
     <section class="results content-wide" aria-labelledby="results-heading">
       <h2 id="results-heading">Results on LOL-Blur</h2>
-      <p class="section-intro">Final epoch-30 checkpoints · 1,800 image pairs</p>
-      <div class="table-scroll" role="region" aria-label="Quantitative results, scroll horizontally on smaller screens" tabindex="0">
+      <p class="section-intro">Quantitative evaluation on 1,800 image pairs</p>
+      <h3 class="table-heading">Controlled comparison</h3>
+      <div class="table-scroll" role="region" aria-label="Controlled comparison results, scroll horizontally on smaller screens" tabindex="0">
         <table>
-          <caption class="sr-only">DarkIR-GAN at the final Stage-III checkpoint. Arrows indicate the preferred metric direction.</caption>
+          <caption class="sr-only">Final epoch-30 checkpoints of the matched Stage-III continuation. Arrows indicate the preferred metric direction; bold indicates the better value.</caption>
           <thead><tr><th scope="col">Method</th><th scope="col">PSNR ↑</th><th scope="col">SSIM ↑</th><th scope="col">LPIPS ↓</th><th scope="col">MUSIQ ↑</th><th scope="col">NIQE ↓</th><th scope="col">NRQM ↑</th></tr></thead>
           <tbody>
-            <tr class="ours-row"><th scope="row">DarkIR-GAN</th><td><strong>24.940</strong></td><td>0.8553</td><td><strong>0.1301</strong></td><td><strong>60.718</strong></td><td><strong>4.737</strong></td><td><strong>5.983</strong></td></tr>
+            <tr><th scope="row">Baseline-continued</th><td>24.803</td><td><strong>0.8558</strong></td><td>0.1530</td><td>55.163</td><td>5.366</td><td>5.102</td></tr>
+<tr class="ours-row"><th scope="row">DarkIR-GAN</th><td><strong>24.940</strong></td><td>0.8553</td><td><strong>0.1301</strong></td><td><strong>60.718</strong></td><td><strong>4.737</strong></td><td><strong>5.983</strong></td></tr>
           </tbody>
         </table>
       </div>
-      <p class="result-summary">Improved perceptual-quality metrics with nearly unchanged distortion fidelity in the reported experiment.</p>
-      <p class="result-note">A single-run controlled comparison. These are final-checkpoint results, rather than independently selected best checkpoints. See the manuscript for the full protocol and limitations.</p>
+      <p class="result-summary"><strong>14.97% lower LPIPS</strong> and <strong>10.07% higher MUSIQ</strong> than the continued baseline, with PSNR increased by 0.137 dB and SSIM decreased by 0.0005.</p>
+      <p class="result-note">Final epoch-30 checkpoints from a single run per branch, using the same Stage-II initialization and a matched 30-epoch training budget.</p>
 
+      <div class="benchmark">
+        <h3 class="table-heading">Comparison with other methods</h3>
+        <div class="table-scroll" role="region" aria-label="LOL-Blur benchmark comparison, scroll horizontally on smaller screens" tabindex="0">
+          <table class="benchmark-table">
+            <caption class="sr-only">LOL-Blur comparison reproduced from Table II of the paper. Bold marks the best value; underline marks the second best value.</caption>
+            <thead><tr><th scope="col">Method</th><th scope="col">PSNR ↑</th><th scope="col">SSIM ↑</th><th scope="col">LPIPS ↓</th><th scope="col">MUSIQ ↑</th><th scope="col">NIQE ↓</th><th scope="col">NRQM ↑</th></tr></thead>
+            <tbody>
+              <tr class="category-row"><th colspan="7" scope="rowgroup">Cascaded Two-stage Pipeline</th></tr>
+<tr><th scope="row">Restormer → LLFlow</th><td>21.89</td><td>0.772</td><td>0.347</td><td>35.42</td><td>4.982</td><td>5.011</td></tr>
+<tr class="category-row"><th colspan="7" scope="rowgroup">General Restoration / Enhancement Baselines</th></tr>
+<tr><th scope="row">MIMO (ICCV &#x27;21)</th><td>22.41</td><td>0.835</td><td>0.262</td><td>35.37</td><td>4.851</td><td>5.140</td></tr>
+<tr><th scope="row">Restormer (CVPR &#x27;22)</th><td>23.63</td><td>0.841</td><td>0.247</td><td>36.65</td><td>5.093</td><td>5.497</td></tr>
+<tr><th scope="row">LLFlow (AAAI &#x27;22)</th><td>24.48</td><td>0.846</td><td>0.235</td><td>34.87</td><td>5.202</td><td>5.312</td></tr>
+<tr class="category-row"><th colspan="7" scope="rowgroup">Joint End-to-end Low-light Deblurring</th></tr>
+<tr><th scope="row">LEDNet (ECCV &#x27;22)</th><td>26.06</td><td>0.852</td><td>0.217</td><td>43.48</td><td>5.435</td><td>5.421</td></tr>
+<tr><th scope="row">LIEDNet (TCSVT &#x27;25)</th><td><u>27.47</u></td><td><u>0.884</u></td><td>0.183</td><td>44.75</td><td>5.129</td><td>5.532</td></tr>
+<tr><th scope="row">LIEDNet-L (TCSVT &#x27;25)</th><td><strong>27.99</strong></td><td><strong>0.897</strong></td><td>0.161</td><td>44.49</td><td><u>4.806</u></td><td><u>5.808</u></td></tr>
+<tr><th scope="row">DarkIR (Baseline-continued)</th><td>24.803</td><td>0.8558</td><td><u>0.1530</u></td><td><u>55.163</u></td><td>5.366</td><td>5.102</td></tr>
+<tr class="category-row"><th colspan="7" scope="rowgroup">Proposed Perception-oriented Variant</th></tr>
+<tr class="ours-row"><th scope="row">DarkIR-GAN (Ours)</th><td>24.940</td><td>0.8553</td><td><strong>0.1301</strong></td><td><strong>60.718</strong></td><td><strong>4.737</strong></td><td><strong>5.983</strong></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="result-note"><strong>Bold</strong>: best; <u>underline</u>: second best. Competing-method values are reproduced from the reported benchmark comparison in the paper, without re-evaluation. Our two rows use the completed evaluations described above. See <a href="assets/DarkIR-GAN.pdf#page=4" target="_blank" rel="noopener">Table II in the paper</a>.</p>
+      </div>
     </section>
 
     <section class="citation text-section" aria-labelledby="citation-heading">

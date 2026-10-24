@@ -17,3 +17,5 @@
 .scene-picker{margin:15px 0 0}.teaser figcaption{font-size:14px;margin-top:17px}.no-script{text-align:center;font-size:12px;color:var(--muted)}
 @media(max-width:550px){.comparison{grid-template-columns:1fr;gap:17px}.result-frame{aspect-ratio:7/4}.image-label{font-size:13px}.teaser{margin-top:30px}#result-placeholder{font-size:13px}.scene-picker{margin-top:14px}}
 @media(prefers-reduced-motion:reduce){.spinner{animation:none}}
+
+.table-heading{font-size:21px;font-weight:600;line-height:1.4;letter-spacing:-.3px;text-align:center;margin:0 0 20px}.benchmark{margin-top:44px}.benchmark-table .category-row th{font-size:12px;font-weight:500;font-style:italic;text-align:left;color:#73777e;background:#f8f9fa;padding:9px 12px;border-top:1px solid #d8dce1}.benchmark-table u{text-underline-offset:3px}.results .result-note a{white-space:nowrap}@media(max-width:700px){.table-heading{font-size:19px}.benchmark{margin-top:34px}}
