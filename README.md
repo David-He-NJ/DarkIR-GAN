@@ -1,8 +1,32 @@
-# DarkIR-GAN
+# DarkIR-GAN: GAN-Based Low-Light Blurred Image Restoration
+
+**Xinyu He** · **Shi Yan** · School of Information Science and Engineering, Lanzhou University
+
+**Accepted at VSIP 2026**
+
+[**Project Page**](https://david-he-nj.github.io/DarkIR-GAN/) · [**Paper (PDF)**](https://david-he-nj.github.io/DarkIR-GAN/assets/DarkIR-GAN.pdf) · [**Model Checkpoints**](https://github.com/David-He-NJ/DarkIR-GAN/releases/tag/v1.0.0) · [**Citation**](#citation)
 
 Official research code for **DarkIR-GAN: GAN-Based Low-Light Blurred Image Restoration**.
 
 DarkIR-GAN keeps the DarkIR generator and the continued-baseline reconstruction recipe, then adds a five-layer PatchGAN discriminator trained with a least-squares adversarial objective. The repository includes the matched Stage III baseline and adversarial branches used for the paper comparison.
+
+## Visual overview
+
+A representative comparison from the [interactive project gallery](https://david-he-nj.github.io/DarkIR-GAN/):
+
+| Low-light blurred input | Restored by DarkIR-GAN |
+|:---:|:---:|
+| <img src="https://david-he-nj.github.io/DarkIR-GAN/assets/street-input.webp" alt="Dark, motion-blurred street scene before restoration" width="450"> | <img src="https://david-he-nj.github.io/DarkIR-GAN/assets/street-gan.webp" alt="The same street scene restored by DarkIR-GAN" width="450"> |
+
+### Architecture
+
+<p align="center">
+  <a href="https://david-he-nj.github.io/DarkIR-GAN/assets/architecture.webp">
+    <img src="https://david-he-nj.github.io/DarkIR-GAN/assets/architecture.webp" alt="DarkIR-GAN architecture: DarkIR generator with the original reconstruction losses and an additional five-layer PatchGAN discriminator for adversarial training" width="900">
+  </a>
+</p>
+
+DarkIR-GAN preserves the **DarkIR generator and its reconstruction losses**, then adds a **five-layer PatchGAN discriminator** with a least-squares adversarial objective. Only the generator is needed for restoration at inference time. See [implementation notes](docs/implementation_notes.md) for the controlled setup and loss coefficients.
 
 ## Main result
 
@@ -16,6 +40,20 @@ Both branches restore the same Stage II checkpoint, optimizer state and schedule
 The raw ten-point trajectories are in [`results/stage3/`](results/stage3/). Run `python scripts/summarize_stage3.py --check` to verify their hashes, epoch schedule and reported endpoint values.
 
 This is a single-run controlled comparison. The two branches are matched in configuration, data split, initialization and training budget, but the historical sampler did not record a seed or consumed-sample manifest, so batch-for-batch identity is not claimed.
+
+At the final epoch, DarkIR-GAN achieves **14.97% lower LPIPS** and **10.07% higher MUSIQ** than the continued baseline, with a **0.137 dB increase in PSNR** and a **0.0005 decrease in SSIM**. These are descriptive differences for this matched single-run experiment, not uncertainty-adjusted estimates.
+
+## Qualitative results
+
+Additional examples from the [project page](https://david-he-nj.github.io/DarkIR-GAN/). Each pair shows the same scene before and after restoration.
+
+| Scene | Low-light blurred input | DarkIR-GAN output |
+|:---|:---:|:---:|
+| Shop | <img src="https://david-he-nj.github.io/DarkIR-GAN/assets/shop-input.webp" alt="Low-light blurred shop scene" width="350"> | <img src="https://david-he-nj.github.io/DarkIR-GAN/assets/shop-gan.webp" alt="Shop scene restored by DarkIR-GAN" width="350"> |
+| Posters | <img src="https://david-he-nj.github.io/DarkIR-GAN/assets/posters-input.webp" alt="Low-light blurred posters scene" width="350"> | <img src="https://david-he-nj.github.io/DarkIR-GAN/assets/posters-gan.webp" alt="Posters scene restored by DarkIR-GAN" width="350"> |
+| Map | <img src="https://david-he-nj.github.io/DarkIR-GAN/assets/map-input.webp" alt="Low-light blurred map scene" width="350"> | <img src="https://david-he-nj.github.io/DarkIR-GAN/assets/map-gan.webp" alt="Map scene restored by DarkIR-GAN" width="350"> |
+
+The full interactive comparison and the paper are available on the [project website](https://david-he-nj.github.io/DarkIR-GAN/). These visual examples supplement, rather than replace, the full-validation metrics and reproducibility records below.
 
 ## Repository map
 
@@ -145,7 +183,17 @@ Detailed boundaries and hashes are in [`docs/reproduction.md`](docs/reproduction
 
 ## Citation
 
-Citation metadata is provided in [`CITATION.cff`](CITATION.cff). No venue acceptance status or DOI is asserted in this repository.
+The paper is **accepted at VSIP 2026**, as indicated on the [project page](https://david-he-nj.github.io/DarkIR-GAN/). Citation metadata is provided in [`CITATION.cff`](CITATION.cff); no DOI is claimed.
+
+```bibtex
+@unpublished{he2026darkirgan,
+  title  = {DarkIR-GAN: GAN-Based Low-Light Blurred Image Restoration},
+  author = {He, Xinyu and Yan, Shi},
+  year   = {2026},
+  note   = {Accepted at VSIP 2026; author manuscript},
+  url    = {https://david-he-nj.github.io/DarkIR-GAN/}
+}
+```
 
 ## Acknowledgements
 
