@@ -4,7 +4,7 @@
 
 **Accepted at VSIP 2026**
 
-[**Project Page**](https://david-he-nj.github.io/DarkIR-GAN/) · [**Paper (PDF)**](https://david-he-nj.github.io/DarkIR-GAN/assets/DarkIR-GAN.pdf) · [**Model Checkpoints**](https://github.com/David-He-NJ/DarkIR-GAN/releases/tag/v1.0.0) · [**Citation**](#citation)
+[**Project Page**](https://david-he-nj.github.io/DarkIR-GAN/) · [**Paper (PDF)**](Paper/DarkIR-GAN.pdf) · [**Model Checkpoints**](https://github.com/David-He-NJ/DarkIR-GAN/releases/tag/v1.0.0) · [**Citation**](#citation)
 
 Official research code for **DarkIR-GAN: GAN-Based Low-Light Blurred Image Restoration**.
 
