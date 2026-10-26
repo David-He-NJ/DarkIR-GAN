@@ -184,7 +184,7 @@ The paper is **accepted at VSIP 2026**, as indicated on the [project page](https
 ```bibtex
 @unpublished{he2026darkirgan,
   title  = {DarkIR-GAN: GAN-Based Low-Light Blurred Image Restoration},
-  author = {He, Xinyu and Yan, Shi},
+  author = {Xinyu He and Shi Yan},
   year   = {2026},
   note   = {Accepted at VSIP 2026},
   url    = {https://david-he-nj.github.io/DarkIR-GAN/}
